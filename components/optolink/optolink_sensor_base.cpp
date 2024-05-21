@@ -43,6 +43,22 @@ void OptolinkSensorBase::update_datapoint_(float value) {
             break;
         }
         break;
+      case 3:
+        switch (div_ratio_) {
+          case 1:
+            optolink_->write_value(datapoint_, DPValue((uint16_t) value));
+            break;
+          case 10:
+          case 100:
+            optolink_->write_value(datapoint_, DPValue((float) value));
+            break;
+          default:
+            optolink_->set_error("Unknown byte/div_ratio combination for number %s", get_sensor_name().c_str());
+            ESP_LOGE("OptolinkSensorBase", "Unknown byte/div_ratio combination for number %s",
+                     get_sensor_name().c_str());
+            break;
+        }
+        break;
       case 4:
         switch (div_ratio_) {
           case 1:
