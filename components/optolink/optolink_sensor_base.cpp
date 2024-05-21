@@ -135,6 +135,35 @@ void OptolinkSensorBase::setup_datapoint_() {
           break;
       }
       break;
+    case 3:
+      switch (div_ratio_) {
+        case 1:
+          datapoint_ = new Datapoint<conv2_1_US>(get_sensor_name().c_str(), "optolink", address_, writeable_);
+          datapoint_->setCallback([this](const IDatapoint &dp, DPValue dp_value) {
+            ESP_LOGD("OptolinkSensorBase", "Datapoint %s - %s: %d", dp.getGroup(), dp.getName(), dp_value.getU16());
+            value_changed(dp_value.getU16());
+          });
+          break;
+        case 10:
+          datapoint_ = new Datapoint<conv2_10_F>(get_sensor_name().c_str(), "optolink", address_, writeable_);
+          datapoint_->setCallback([this](const IDatapoint &dp, DPValue dp_value) {
+            ESP_LOGD("OptolinkSensorBase", "Datapoint %s - %s: %f", dp.getGroup(), dp.getName(), dp_value.getFloat());
+            value_changed(dp_value.getFloat());
+          });
+          break;
+        case 100:
+          datapoint_ = new Datapoint<conv2_100_F>(get_sensor_name().c_str(), "optolink", address_, writeable_);
+          datapoint_->setCallback([this](const IDatapoint &dp, DPValue dp_value) {
+            ESP_LOGD("OptolinkSensorBase", "Datapoint %s - %s: %f", dp.getGroup(), dp.getName(), dp_value.getFloat());
+            value_changed(dp_value.getFloat());
+          });
+          break;
+        default:
+          optolink_->set_error("Unknown byte/div_ratio combination for sensor %s", get_sensor_name().c_str());
+          ESP_LOGE("OptolinkSensorBase", "Unknown byte/div_ratio combination for sensor %s", get_sensor_name().c_str());
+          break;
+      }
+      break;    
     case 4:
       switch (div_ratio_) {
         case 1:
