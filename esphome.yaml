@@ -1,0 +1,433 @@
+esphome:
+  name: test-optolink
+  friendly_name: test_optolink
+
+esp8266:
+  board: d1_mini    
+
+logger:
+  hardware_uart: UART1
+  level: very_verbose
+
+api:
+  encryption:
+    key: "4711"
+ 
+ota:
+  - platform: esphome
+    password: "0815"
+  
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
+      manual_ip:
+        static_ip: 192.168.xxx
+        gateway: 192.168.xxx
+        subnet: 255.255.255.0
+
+
+
+
+external_components:
+  - source: github://80morpheus/esphome_optolink
+    components: [ optolink ]
+    refresh: 0s
+  
+uart:
+  - id: uart_vitoconnect
+  #  rx_pin: GPIO9              # ESP32 RX2
+  #  tx_pin: GPIO10              # ESP32 TX2
+    rx_pin: GPIO03             # ESP8266 RX
+    tx_pin: GPIO01             # ESP8266 TX
+    baud_rate: 4800
+    data_bits: 8
+    parity: EVEN
+    stop_bits: 2
+
+optolink:
+  protocol: P300
+  logger: true
+
+
+
+sensor:
+  - platform: optolink
+    name: ww_soll_temp
+    address: 0x6000
+    bytes: 2
+    div_ratio: 10
+    update_interval: 300s
+
+
+    
+  
+#####################################################
+# Allgemein
+  - platform: optolink
+    name: "Außentemperatur"
+    address: 0x01C1            
+    bytes: 3    
+    div_ratio: 1        
+    update_interval: 30s       
+    unit_of_measurement: "°C"
+    device_class: temperature
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Geräte Var"
+    address: 0x01C0
+    bytes: 3
+    div_ratio: 1
+    update_interval: 30s
+  - platform: optolink
+    name: "Sekundär Vorlauf"
+    address: 0x01C5
+    bytes: 3
+    div_ratio: 1
+    update_interval: 30s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Sekundär Rücklauf"
+    address: 0x01C6
+    bytes: 3
+    div_ratio: 1
+    update_interval: 30s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+#####################################################
+# Speicher
+  - platform: optolink
+    name: "WW oben"
+    address: 0x01CD
+    bytes: 3
+    div_ratio: 1
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "WW unten"
+    address: 0x01CE
+    bytes: 3
+    div_ratio: 1
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Heizung Speicher"
+    address: 0x01CB
+    bytes: 3
+    div_ratio: 1
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "WW Soll Temp"
+    address: 0x6000
+    bytes: 2
+    div_ratio: 1
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+
+#####################################################
+# Energiebilanz
+  - platform: optolink
+    name: "Faktor Energie"
+    address: 0x163F
+    bytes: 1
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "x"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+  - platform: optolink
+    name: "Heizwärme Heizung"
+    address: 0x1640
+    bytes: 4
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Heizwärme Warmwasser"
+    address: 0x1650
+    bytes: 4
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Elektroenergie Heizung"
+    address: 0x1660
+    bytes: 4
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Elektroenergie Warmwasser"
+    address: 0x1670
+    bytes: 4
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "JAZ ges"
+    address: 0x1680
+    bytes: 1
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink 
+    name: "JAZ Heizen"
+    address: 0x1681
+    bytes: 1
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink 
+    name: "JAZ WW"
+    address: 0x1682
+    bytes: 1
+    div_ratio: 1
+    update_interval: 300s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+
+####################################################
+# Heizkreis 3      
+  - platform: optolink 
+    name: "Heizkreis 3 VL"
+    address: 0x01D5
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+    
+
+
+####################################################
+# Verdichter
+  - platform: optolink
+    name: "Primär Vorlauf"
+    address: 0xB400
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Primär Rücklauf"
+    address: 0xB401
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "SEK_VL"
+    address: 0xB402
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "SEK_RL"
+    address: 0xB403
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Flüssiggas"
+    address: 0xB404
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Verdampfung Soll"
+    address: 0xB406
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Verdampfung"
+    address: 0xB407
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Kondensation"
+    address: 0xB408
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Sauggas"
+    address: 0xB409
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Heißgas"
+    address: 0xB40A
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Sauggas Druck"
+    address: 0xB410
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "bar"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Heißgas Druck"
+    address: 0xB411
+    bytes: 3
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "bar"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: optolink
+    name: "Primärquelle"
+    address: 0xB420
+    bytes: 2
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+  - platform: optolink
+    name: "Sekundärpumpe"
+    address: 0xB421
+    bytes: 2
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+  - platform: optolink
+    name: "WW_Pumpe"
+    address: 0xB422
+    bytes: 2
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+  - platform: optolink
+    name: "Verdichter"
+    address: 0xB423
+    bytes: 2
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+  - platform: optolink
+    name: "ECV"
+    address: 0xB424
+    bytes: 2
+    div_ratio: 1
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 1
+
+
+
+
+number:
+  - platform: optolink
+    name: set_ww_soll_temp
+    unit_of_measurement: °C
+    address: 0x6000
+    bytes: 2
+    min_value: 300.0
+    max_value: 600.0
+    step: 10.0
+    div_ratio: 1
+
+
+
+
+button:
+  - platform: restart
+    name: "Opto Restart"    b
